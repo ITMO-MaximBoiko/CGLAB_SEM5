@@ -1,0 +1,4 @@
+C:\Users\Maxim\Documents\microsoft directx-graphics-samples master Samples-Desktop_D3D12MeshShaders\src\MeshletGenerator\bin\x64\Debug\D3D12\D3D12Core.dll
+C:\Users\Maxim\Documents\microsoft directx-graphics-samples master Samples-Desktop_D3D12MeshShaders\src\MeshletGenerator\bin\x64\Debug\D3D12\D3D12Core.pdb
+C:\Users\Maxim\Documents\microsoft directx-graphics-samples master Samples-Desktop_D3D12MeshShaders\src\MeshletGenerator\bin\x64\Debug\D3D12\D3D12SDKLayers.dll
+C:\Users\Maxim\Documents\microsoft directx-graphics-samples master Samples-Desktop_D3D12MeshShaders\src\MeshletGenerator\bin\x64\Debug\D3D12\D3D12SDKLayers.pdb
