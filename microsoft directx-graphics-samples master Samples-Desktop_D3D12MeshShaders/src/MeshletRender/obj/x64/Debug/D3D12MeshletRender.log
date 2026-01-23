@@ -1,3 +1,3 @@
 ﻿  D3D12MeshletRender.cpp
-     Создается библиотека bin\x64\Debug\D3D12MeshletRender.lib и объект bin\x64\Debug\D3D12MeshletRender.exp
-  D3D12MeshletRender.vcxproj -> C:\Users\Maxim\Documents\microsoft directx-graphics-samples master Samples-Desktop_D3D12MeshShaders\src\MeshletRender\bin\x64\Debug\D3D12MeshletRender.exe
+C:\Users\Maxim\Documents\GitHub\CGLAB_SEM5\microsoft directx-graphics-samples master Samples-Desktop_D3D12MeshShaders\src\MeshletRender\D3D12MeshletRender.cpp(518,68): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
+  D3D12MeshletRender.vcxproj -> C:\Users\Maxim\Documents\GitHub\CGLAB_SEM5\microsoft directx-graphics-samples master Samples-Desktop_D3D12MeshShaders\src\MeshletRender\bin\x64\Debug\D3D12MeshletRender.exe
