@@ -688,7 +688,7 @@ void CGLAB::CreateGBuffer()
 		D3D12_HEAP_FLAG_NONE,
 		&texDesc,
 		D3D12_RESOURCE_STATE_RENDER_TARGET,
-		&CD3DX12_CLEAR_VALUE(albedoFormat, Colors::Black),
+		&CD3DX12_CLEAR_VALUE(albedoFormat, Colors::LightSteelBlue),
 		IID_PPV_ARGS(&mGBufferAlbedo)));
 
 	// Создание RTV -------------------------------------------------------------
@@ -1074,7 +1074,7 @@ void CGLAB::BuildShadowMapViews()
 				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 				D3D12_HEAP_FLAG_NONE,
 				&texDesc,
-				D3D12_RESOURCE_STATE_GENERIC_READ, // Start in generic read, will transition to DEPTH_WRITE
+				D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, // Start in generic read, will transition to DEPTH_WRITE
 				&clearValue,
 				IID_PPV_ARGS(&light.ShadowMap)));
 			// Create DSV for the shadow map.
@@ -1804,7 +1804,7 @@ void CGLAB::DrawSceneToShadowMap()
 				mCommandList->RSSetScissorRects(1, &mShadowScissorRect);
 				// Transition the shadow map from generic read to depth-write.
 				mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(light.ShadowMap.Get(),
-					D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_DEPTH_WRITE));
+					D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE));
 
 				// Clear the shadow map.
 				mCommandList->ClearDepthStencilView(light.ShadowMapDsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
