@@ -8,7 +8,7 @@ bool QuadTreeNode::ShouldSplit(const XMFLOAT3& cameraPos, float heightscale,int 
     auto camPos = cameraPos;
     camPos.y = 0;
     XMVECTOR camPosVec = XMLoadFloat3(&camPos);
-    float lodneeddist = ( mapsize/2.0f - depth * mapsize/16);
+    float lodneeddist = ( mapsize - depth * mapsize/8);
     BoundingSphere sphere;
     sphere.Center = cameraPos;
     sphere.Radius = lodneeddist;
@@ -130,7 +130,7 @@ void TerrainSystem::GetVisibleTiles(std::vector<TerrainTile*>& outTiles)
 void CGLAB::GenerateTileGeometry(const XMFLOAT3& worldPos, float tileSize, int lodLevel,
     std::vector<Vertex>& vertices, std::vector<std::uint32_t>& indices)
 {
-    int baseResolution = 16;
+    int baseResolution = 2;
     float Factor = 1;
     int resolution = static_cast<int>(baseResolution * std::pow(Factor, lodLevel));
 
