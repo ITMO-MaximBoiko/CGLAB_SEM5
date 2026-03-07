@@ -89,8 +89,6 @@ VertexOut VS(VertexIn vin)
     // Transform to homogeneous clip space.
 
 	// Output vertex attributes for interpolation across triangle.
- 
-    
     return vout;
 }
 

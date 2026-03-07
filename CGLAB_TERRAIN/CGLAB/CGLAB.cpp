@@ -1095,10 +1095,6 @@ void CGLAB::BuildShadowMapViews()
 		}
 	}
 	mLights;
-
-	
-
-
 	
 }
 
@@ -1114,7 +1110,7 @@ void CGLAB::BuildDescriptorHeaps()
 	ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&mSrvDescriptorHeap)));
 
 
-	// Создание SRV -------------------------------------------------------------
+	// ============================================ Создание SRV =================================================
 
 	//
 	// Fill out the heap with actual descriptors.

@@ -195,6 +195,17 @@ private:
 	void BuildTerrainRootSignature();
 	void DrawTilesRenderItems(ID3D12GraphicsCommandList* cmdList, std::vector<TerrainTile*> tiles, int HeightIndex);
 
+	// ============================================ PAINTING SYSTEM ====================================================
+	// =================================================================================================================
+
+	ComPtr<ID3D12Resource> mPaintTexture;
+	void InitializePaintingSystem();
+	void CalculateRayIntersect();
+	void PlaceNormalAtCoords(int x, int y);
+
+
+
+
 	Camera cam;
 
 };
