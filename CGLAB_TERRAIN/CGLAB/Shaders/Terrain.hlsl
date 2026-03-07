@@ -45,6 +45,8 @@ cbuffer cbTerrainTile : register(b3) // b1 - регистр для буфера
 Texture2D gHeightMap : register(t0); // Карта высот
 Texture2D gDiffuseMap : register(t1); // Диффузная текстура
 Texture2D gNormalMap : register(t2); // Карта нормалей
+Texture2D gPaintMap : register(t3); // PAINT TEXTURE
+
 
 SamplerState gSamPointWrap : register(s0);
 SamplerState gSamPointClamp : register(s1);
@@ -155,6 +157,8 @@ PixelOut PS(VertexOut pin) : SV_Target
 {
     PixelOut pout;
     
+    float drewHere = gPaintMap.Sample(gSamLinearWrap, pin.TexC);
+    
     // Семплируем диффузную текстуру
     float4 diffuseAlbedo = gDiffuseMap.Sample(gSamAnisotropicWrap, pin.TexC);
     
@@ -205,6 +209,12 @@ PixelOut PS(VertexOut pin) : SV_Target
     pout.Albedo = diffuseAlbedo;
     pout.Normal = float4(bumpedNormalW, gRoughness);
     pout.Position = float4(pin.PosW, 1.0f);
+    
+    if(drewHere != 0.)
+    {
+        pout.Albedo = float4(0., 0., 0., 1.);
+        pout.Normal = float4(1., 0., 0., 1.);
+    }
     
     return pout;
 }

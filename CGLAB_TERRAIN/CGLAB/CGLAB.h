@@ -199,11 +199,28 @@ private:
 	// =================================================================================================================
 
 	ComPtr<ID3D12Resource> mPaintTexture;
+	ComPtr<ID3D12Resource> mPaintTextureUpload;
+	std::vector<float> mNormalPaintData;
+
+	ComPtr<ID3D12DescriptorHeap> mPaintRtvHeap = nullptr;
+	ComPtr<ID3D12RootSignature> mPaintRootSignature = nullptr;
+	int PaintHeight = 1024;
+	int PaintWidth = 1024;
+	float mBrushRadius = .02f;
+
+	int mPaintSrvIndex;
+	CD3DX12_CPU_DESCRIPTOR_HANDLE mPaintDescHandle;
+
+
+	XMFLOAT2 mBrushHitUV;
+	bool mPainting;
+
 	void InitializePaintingSystem();
-	void CalculateRayIntersect();
-	void PlaceNormalAtCoords(int x, int y);
 
+	void PaintAtCoords(XMFLOAT2 uv, bool raise);
 
+	bool RaycastToTerrainUV(int sx, int sy, XMFLOAT2& uvOut, XMFLOAT3& hitWorld);
+	void UpdatePaintTexture();
 
 
 	Camera cam;

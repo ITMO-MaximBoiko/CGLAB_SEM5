@@ -114,6 +114,10 @@ bool CGLAB::Initialize()
     BuildRenderItems();
     BuildFrameResources();
 	ImguiInit();
+
+	InitializePaintingSystem();
+
+
 	
     // Execute the initialization commands.
     ThrowIfFailed(mCommandList->Close());
@@ -362,6 +366,31 @@ void CGLAB::OnMouseDown(WPARAM btnState, int x, int y)
     mLastMousePos.x = x;
     mLastMousePos.y = y;
 
+
+	XMFLOAT2 hit_uv;
+	XMFLOAT3 hit_pos;
+
+	if (RaycastToTerrainUV(x, y, hit_uv, hit_pos))
+	{
+		std::cout << x << " " << y << "\n";
+		mPainting = true;
+		mBrushHitUV = hit_uv;
+		if (RaycastToTerrainUV(x, y, hit_uv, hit_pos))
+		{
+			// Применяем кисть с сохранением
+			bool raise = ((btnState & MK_LBUTTON) != 0);
+			PaintAtCoords(hit_uv, raise);
+
+			// Также обновляем для отображения в реальном времени
+			mPainting = true;
+			mBrushHitUV = hit_uv;
+
+			//std::cout << "Mouse painting at UV: (" << uv.x << ", " << uv.y
+			//	<< "), World: (" << hit.x << ", " << hit.y << ", " << hit.z << ")" << std::endl;
+		}
+	}
+
+
     SetCapture(mhMainWnd);
 }
 
@@ -380,10 +409,34 @@ void CGLAB::OnMouseMove(WPARAM btnState, int x, int y)
 			float dx = XMConvertToRadians(0.25f * static_cast<float>(x - mLastMousePos.x));
 			float dy = XMConvertToRadians(0.25f * static_cast<float>(y - mLastMousePos.y));
 
+			// DRAW STUFF
+
+			XMVECTOR rayOrigin, rayDirection;
+
+
+
 			// Update angles based on input to orbit camera around box.
 
 			cam.YawPitch(dx, -dy);
 		}
+
+		if ((btnState & MK_LBUTTON) != 0 || (btnState & MK_RBUTTON) != 0)
+		{
+			XMFLOAT2 uv;
+			XMFLOAT3 hit;
+			if (RaycastToTerrainUV(x, y, uv, hit))
+			{
+				std::cout << x << " " << y << "\n";
+				// Применяем кисть с сохранением
+				bool raise = ((btnState & MK_LBUTTON) != 0);
+				PaintAtCoords(uv, raise);
+
+				// Также обновляем для отображения в реальном времени
+				mPainting = true;
+				mBrushHitUV = uv;
+			}
+		}
+
 		mLastMousePos.x = x;
 		mLastMousePos.y = y;
 	}
@@ -817,23 +870,27 @@ void CGLAB::BuildTerrainRootSignature()
 	CD3DX12_DESCRIPTOR_RANGE normalRange;
 	normalRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);  // Нормальная карта в регистре t1
 
+	CD3DX12_DESCRIPTOR_RANGE paintRange;
+	paintRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3);  // FOR PAINT SYSTEM
+
 	// Root parameter can be a table, root descriptor or root constants.
-	CD3DX12_ROOT_PARAMETER slotRootParameter[7];
+	CD3DX12_ROOT_PARAMETER slotRootParameter[8];
 
 	// Perfomance TIP: Order from most frequent to least frequent.
 	slotRootParameter[0].InitAsDescriptorTable(1, &heightRange, D3D12_SHADER_VISIBILITY_ALL);
 	slotRootParameter[1].InitAsDescriptorTable(1, &diffuseRange, D3D12_SHADER_VISIBILITY_ALL);
 	slotRootParameter[2].InitAsDescriptorTable(1, &normalRange, D3D12_SHADER_VISIBILITY_ALL);
+	slotRootParameter[3].InitAsDescriptorTable(1, &paintRange, D3D12_SHADER_VISIBILITY_ALL);
 
-	slotRootParameter[3].InitAsConstantBufferView(0); // register b0
-	slotRootParameter[4].InitAsConstantBufferView(1); // register b1
-	slotRootParameter[5].InitAsConstantBufferView(2); // register b2
-	slotRootParameter[6].InitAsConstantBufferView(3); // register b3
+	slotRootParameter[4].InitAsConstantBufferView(0); // register b0
+	slotRootParameter[5].InitAsConstantBufferView(1); // register b1
+	slotRootParameter[6].InitAsConstantBufferView(2); // register b2
+	slotRootParameter[7].InitAsConstantBufferView(3); // register b3
 
 	auto staticSamplers = GetStaticSamplers();
 
 	// A root signature is an array of root parameters.
-	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(7, slotRootParameter,
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(8, slotRootParameter,
 		(UINT)staticSamplers.size(), staticSamplers.data(),
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
@@ -1104,7 +1161,7 @@ void CGLAB::BuildDescriptorHeaps()
 	// Create the SRV heap.
 	//
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-	srvHeapDesc.NumDescriptors = static_cast<int>(mTextures.size()) + 3 + static_cast<int>(mLights.size());
+	srvHeapDesc.NumDescriptors = static_cast<int>(mTextures.size()) + 3 + static_cast<int>(mLights.size() + 1);
 	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&mSrvDescriptorHeap)));
@@ -1171,6 +1228,20 @@ void CGLAB::BuildDescriptorHeaps()
 		}
 	}
 	
+
+	mPaintSrvIndex = mTextures.size() + 3 + mLights.size(); // После shadow maps
+	CD3DX12_CPU_DESCRIPTOR_HANDLE srvHandle(mSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+	srvHandle.Offset(mPaintSrvIndex, mCbvSrvDescriptorSize);
+
+	//D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.MipLevels = 1;
+
+	md3dDevice->CreateShaderResourceView(mPaintTexture.Get(), &srvDesc, srvHandle);
+	mPaintDescHandle = srvHandle;
 
 
 	HRESULT hr = md3dDevice->GetDeviceRemovedReason();
@@ -1922,16 +1993,17 @@ void CGLAB::DeferredDraw(const GameTimer& gt)
 
 	DrawRenderItems(mCommandList.Get(), mOpaqueRitems);
 	
-	// ===============RENDERING TERRAIN=====================
+	// ======================================================== RENDERING TERRAIN =========================================================
 	if (!m_visibleTerrainTiles.empty())
 	{
+		UpdatePaintTexture();
 		// Переключаемся на terrain PSO
 		if (m_terrainSystem->wireframe)
 			mCommandList->SetPipelineState(mPSOs["terrainWIRE"].Get());
 		else
 			mCommandList->SetPipelineState(mPSOs["terrain"].Get());
 		mCommandList->SetGraphicsRootSignature(mTerrainRootSignature.Get());
-		mCommandList->SetGraphicsRootConstantBufferView(4, passCB->GetGPUVirtualAddress());
+		mCommandList->SetGraphicsRootConstantBufferView(5, passCB->GetGPUVirtualAddress());
 		DrawTilesRenderItems(mCommandList.Get(), m_visibleTerrainTiles, m_terrainSystem->m_hmapIndex);
 	}
 
@@ -1945,8 +2017,9 @@ void CGLAB::DeferredDraw(const GameTimer& gt)
 		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
 	};
 	mCommandList->ResourceBarrier(3, barrier);
+	
+	
 	// ================================================
-
 	// ===============LIGHTING PASS=====================
 
 	mCommandList->SetPipelineState(mPSOs["lighting"].Get());
@@ -2126,16 +2199,204 @@ void CGLAB::DrawTilesRenderItems(ID3D12GraphicsCommandList* cmdList, std::vector
 		cmdList->SetGraphicsRootDescriptorTable(2, normalHandle);
 
 
+		CD3DX12_GPU_DESCRIPTOR_HANDLE paintHandle(mSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+		paintHandle.Offset(mPaintSrvIndex, mCbvSrvDescriptorSize);
+		cmdList->SetGraphicsRootDescriptorTable(3, paintHandle);
+
+
 		D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = objectCB->GetGPUVirtualAddress() + ri->ObjCBIndex * objCBByteSize;
 		D3D12_GPU_VIRTUAL_ADDRESS matCBAddress = matCB->GetGPUVirtualAddress() + ri->Mat->MatCBIndex * matCBByteSize;
 
-		cmdList->SetGraphicsRootConstantBufferView(3, objCBAddress);
-		cmdList->SetGraphicsRootConstantBufferView(5, matCBAddress);
+		cmdList->SetGraphicsRootConstantBufferView(4, objCBAddress);
+		cmdList->SetGraphicsRootConstantBufferView(6, matCBAddress);
 		auto terrCB = mCurrFrameResource->TerrainCB->Resource();
-		mCommandList->SetGraphicsRootConstantBufferView(6, terrCB->GetGPUVirtualAddress() + t->tileIndex * terrCBByteSize);
+		mCommandList->SetGraphicsRootConstantBufferView(7, terrCB->GetGPUVirtualAddress() + t->tileIndex * terrCBByteSize);
 		cmdList->DrawIndexedInstanced(ri->IndexCount, 1, ri->StartIndexLocation, ri->BaseVertexLocation, 0);
 	}
 	
+}
+
+bool CGLAB::RaycastToTerrainUV(int sx, int sy, XMFLOAT2& uvOut, XMFLOAT3& hitWorld)
+{
+	// Матрицы камеры
+	XMMATRIX view = cam.GetView();
+	XMMATRIX proj = cam.GetProj();
+	XMMATRIX invView = XMMatrixInverse(nullptr, view);
+	XMMATRIX invProj = XMMatrixInverse(nullptr, proj);
+
+
+	float px = 2.0f * sx / mClientWidth - 1.0f;
+	float py = -2.0f * sy / mClientHeight + 1.0f;
+
+	XMVECTOR rayClip = XMVectorSet(px, py, 1.0f, 1.0f);
+
+	XMVECTOR rayView = XMVector3TransformCoord(rayClip, invProj);
+	rayView = XMVectorSetW(rayView, 0.0f);
+
+
+	XMVECTOR rayWorld = XMVector3Normalize(XMVector3TransformNormal(rayView, invView));
+	XMVECTOR camPos = cam.GetPosition();
+
+	// Плоскость террейна: y = 0
+	float camY = XMVectorGetY(camPos);
+	float rayY = XMVectorGetY(rayWorld);
+
+	// Если луч параллелен земле — пересечения нет
+	if (fabs(rayY) < 1e-6f)
+		return false;
+
+	// t — точка пересечения луча с y=0
+	float t = -camY / rayY;
+	if (t < 0.0f)
+		return false; // земля позади камеры
+
+	// hit point
+	XMVECTOR p = camPos + rayWorld * t;
+	XMStoreFloat3(&hitWorld, p);
+
+	// проверка внутри террейна
+	if (hitWorld.x < 0 || hitWorld.z < 0 ||
+		hitWorld.x > m_terrainSystem->m_worldSize ||
+		hitWorld.z > m_terrainSystem->m_worldSize)
+		return false;
+
+	// UV координаты
+	uvOut.x = hitWorld.x / m_terrainSystem->m_worldSize;
+	uvOut.y = hitWorld.z / m_terrainSystem->m_worldSize;
+
+	return true;
+}
+
+void CGLAB::UpdatePaintTexture()
+{
+	D3D12_SUBRESOURCE_DATA textureData = {};
+	textureData.pData = mNormalPaintData.data();
+	textureData.RowPitch = PaintWidth * sizeof(float);
+	textureData.SlicePitch = textureData.RowPitch * PaintHeight;
+
+	// SRV -> COPY
+	mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(
+		mPaintTexture.Get(),
+		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+		D3D12_RESOURCE_STATE_COPY_DEST));
+
+	UpdateSubresources(mCommandList.Get(), mPaintTexture.Get(),
+		mPaintTextureUpload.Get(), 0, 0, 1, &textureData);
+
+	// COPY -> SRV
+	mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(
+		mPaintTexture.Get(),
+		D3D12_RESOURCE_STATE_COPY_DEST,
+		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
+
+}
+
+
+void CGLAB::InitializePaintingSystem()
+{
+	mNormalPaintData.resize(PaintWidth * PaintHeight, 0.0);
+
+	// ================== PAINT TEXTURE DESCRIPTOR =======================
+	D3D12_RESOURCE_DESC paintTexDesc = {};
+	paintTexDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	paintTexDesc.Alignment = 0;
+	paintTexDesc.Height = PaintHeight;
+	paintTexDesc.Width = PaintWidth;
+	paintTexDesc.MipLevels = 1;
+	paintTexDesc.DepthOrArraySize = 1;
+	paintTexDesc.Format = DXGI_FORMAT_R32_FLOAT;
+	paintTexDesc.SampleDesc.Count = 1;
+	paintTexDesc.SampleDesc.Quality = 0;
+	paintTexDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	paintTexDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	// ================= PAINT HEAP ===========================
+	D3D12_HEAP_PROPERTIES paintHeapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+	ThrowIfFailed(md3dDevice->CreateCommittedResource(
+		&paintHeapProp,
+		D3D12_HEAP_FLAG_NONE,
+		&paintTexDesc,
+		D3D12_RESOURCE_STATE_COPY_DEST,
+		nullptr,
+		IID_PPV_ARGS(&mPaintTexture)));
+
+	// =================== PAINT UPLOAD BUFFER ===========================
+	UINT64 UBSize = GetRequiredIntermediateSize(mPaintTexture.Get(), 0, 1);
+	paintHeapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+	D3D12_RESOURCE_DESC bufferDesc = CD3DX12_RESOURCE_DESC::Buffer(UBSize);
+
+	ThrowIfFailed(md3dDevice->CreateCommittedResource(
+		&paintHeapProp,
+		D3D12_HEAP_FLAG_NONE,
+		&bufferDesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&mPaintTextureUpload)));
+
+	// ===================== INITIALIZATION ================================
+	D3D12_SUBRESOURCE_DATA textureData = {};
+	textureData.pData = mNormalPaintData.data();
+	textureData.RowPitch = PaintWidth * sizeof(float);
+	textureData.SlicePitch = textureData.RowPitch * PaintHeight;
+
+	UpdateSubresources(mCommandList.Get(), mPaintTexture.Get(),
+		mPaintTextureUpload.Get(), 0, 0, 1, &textureData);
+
+	// ===================== TRANSITION ==========================
+
+	mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(
+		mPaintTexture.Get(),
+		D3D12_RESOURCE_STATE_COPY_DEST,
+		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
+}
+
+void CGLAB::PaintAtCoords(XMFLOAT2 uv, bool raise)
+{
+	// Преобразуем UV в координаты текстуры
+	int texX = static_cast<int>(uv.x * PaintWidth);
+	int texY = static_cast<int>(uv.y * PaintHeight);
+
+	// Радиус кисти в пикселях
+	float brushRadiusPixels = mBrushRadius * PaintWidth;
+
+	// Область влияния кисти
+	int minX = max(0, texX - static_cast<int>(brushRadiusPixels));
+	int maxX = (std::min)(static_cast<int>(PaintWidth), texX + static_cast<int>(brushRadiusPixels));
+	int minY = max(0, texY - static_cast<int>(brushRadiusPixels));
+	int maxY = std::min(static_cast<int>(PaintWidth), texY + static_cast<int>(brushRadiusPixels));
+
+
+	for (int y = minY; y < maxY; ++y)
+	{
+		for (int x = minX; x < maxX; ++x)
+		{
+			float dx = x - texX;
+			float dy = y - texY;
+			float dist = sqrtf(dx * dx + dy * dy);
+
+			if (dist <= brushRadiusPixels)
+			{
+				// Сглаженное затухание к краям
+				float falloff = 1.0f - (dist / brushRadiusPixels);
+				falloff = falloff * falloff; // Квадратичное затухание
+
+				// Применяем изменение
+				int index = y * PaintWidth + x;
+				if (raise)
+				{
+					mNormalPaintData[index] += 0.1 * falloff;
+				}
+				else
+				{
+					mNormalPaintData[index] -= 0.1 * falloff;
+				}
+
+				// Ограничиваем значения
+				mNormalPaintData[index] = (std::max)(-1.0f, std::min(1.0f, mNormalPaintData[index]));
+			}
+		}
+
+	}
 }
 
 std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> CGLAB::GetStaticSamplers()
