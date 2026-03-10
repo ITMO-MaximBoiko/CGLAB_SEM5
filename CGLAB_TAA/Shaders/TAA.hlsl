@@ -50,12 +50,20 @@ VSOut VS(uint vid : SV_VertexID)
 
 PSOut PS(VSOut pin) : SV_Target
 {
+    
+    float epsilon = 0.00001;
+
     PSOut pout;
     float2 velocity = VelocityTexture.Sample(gsamPointClamp, pin.TexC).xy;
     float motion = length(velocity);
     float2 prevTexC = pin.TexC - velocity;
     float4 historyColor = prevFrame.Sample(gsamLinearClamp, prevTexC);
     float4 currentColor = currFrame.Sample(gsamPointClamp, pin.TexC);
+    
+    if (motion > epsilon)
+    {
+        currentColor = float4(1., 0., 0., 1.);
+    }
     
     float4 NearColor0 = currFrame.Sample(gsamLinearWrap, pin.TexC, int2(1, 0));
     float4 NearColor1 = currFrame.Sample(gsamLinearWrap, pin.TexC, int2(0, 1));
