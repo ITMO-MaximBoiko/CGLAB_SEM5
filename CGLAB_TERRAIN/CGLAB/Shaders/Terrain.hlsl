@@ -212,7 +212,7 @@ PixelOut PS(VertexOut pin) : SV_Target
     
     if(drewHere != 0.)
     {
-        pout.Albedo = float4(0., 0., 0., 1.);
+       // pout.Albedo *= float4(0.3, 0.3, 0.3, 1.);
         pout.Normal = float4(1., 0., 0., 1.);
     }
     
