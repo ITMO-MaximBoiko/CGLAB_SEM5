@@ -1,18 +1,7 @@
-﻿  Camera.cpp
-  d3dApp.cpp
-  d3dUtil.cpp
-  DDSTextureLoader.cpp
-  GameTimer.cpp
-  GeometryGenerator.cpp
-  MathHelper.cpp
-  FrameResource.cpp
-  Gbuffer.cpp
-  ShadowMap.cpp
-  DX12App.cpp
+﻿  DX12App.cpp
 C:\Users\Maxim\Documents\GitHub\CGLAB_SEM5\CGLAB_ATMOSPHERE\DX12App\DX12App.cpp(356,23): warning C4305: инициализация: усечение из "double" в "float"
 C:\Users\Maxim\Documents\GitHub\CGLAB_SEM5\CGLAB_ATMOSPHERE\DX12App\DX12App.cpp(1560,36): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
 C:\Users\Maxim\Documents\GitHub\CGLAB_SEM5\CGLAB_ATMOSPHERE\DX12App\DX12App.cpp(1564,67): warning C4267: аргумент: преобразование из "size_t" в "INT"; возможна потеря данных
 C:\Users\Maxim\Documents\GitHub\CGLAB_SEM5\CGLAB_ATMOSPHERE\DX12App\DX12App.cpp(1565,67): warning C4267: аргумент: преобразование из "size_t" в "INT"; возможна потеря данных
 C:\Users\Maxim\Documents\GitHub\CGLAB_SEM5\CGLAB_ATMOSPHERE\DX12App\DX12App.cpp(1566,49): warning C4267: аргумент: преобразование из "size_t" в "INT"; возможна потеря данных
-  Создание кода...
   DX12App.vcxproj -> C:\Users\Maxim\Documents\GitHub\CGLAB_SEM5\CGLAB_ATMOSPHERE\DX12App\x64\Debug\DX12App.exe

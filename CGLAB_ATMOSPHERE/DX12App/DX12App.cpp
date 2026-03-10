@@ -787,9 +787,9 @@ void DX12App::UpdatePostProcessCB(const GameTimer& gt)
 	const float factor = (8.0f * pi * pi * pi * delta2 / (3.0f * N)) * Fdelta;
 
 	postProcessSettings.BetaRayleigh = {
-		SigmaRayleigh(650.0f, factor) * rayleighMultiplier,
 		SigmaRayleigh(570.0f, factor) * rayleighMultiplier,
-		SigmaRayleigh(475.0f, factor) * rayleighMultiplier
+		SigmaRayleigh(370.0f, factor) * rayleighMultiplier,
+		SigmaRayleigh(370.0f, factor) * rayleighMultiplier
 	};
 
 	// Mie ��������� (��������� �� �������/������)
