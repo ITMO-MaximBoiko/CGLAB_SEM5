@@ -3,8 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\Maxim\\Documents\\GitHub\\CGLAB_SEM5\\RT_LAB\\DX12App\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Maxim\\Documents\\GitHub\\CGLAB_SEM5\\RT_LAB\\DX12App\\Shaders\\DeferredLights.hlsl||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Shaders\\DeferredLights.hlsl||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{23D47CEE-6F04-46F2-B680-AF36FB5A386A}|DX12App.vcxproj|C:\\Users\\Maxim\\Documents\\GitHub\\CGLAB_SEM5\\RT_LAB\\DX12App\\DX12App.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{23D47CEE-6F04-46F2-B680-AF36FB5A386A}|DX12App.vcxproj|solutionrelative:DX12App.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Maxim\\Documents\\GitHub\\CGLAB_SEM5\\RT_LAB\\DX12App\\Shaders\\RTLights.hlsl||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Shaders\\RTLights.hlsl||{8B382828-6202-11D1-8870-0000F87579D2}"
     }
   ],
   "DocumentGroupContainers": [
@@ -19,15 +27,39 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "DeferredLights.hlsl",
+              "DocumentMoniker": "C:\\Users\\Maxim\\Documents\\GitHub\\CGLAB_SEM5\\RT_LAB\\DX12App\\Shaders\\DeferredLights.hlsl",
+              "RelativeDocumentMoniker": "Shaders\\DeferredLights.hlsl",
+              "ToolTip": "C:\\Users\\Maxim\\Documents\\GitHub\\CGLAB_SEM5\\RT_LAB\\DX12App\\Shaders\\DeferredLights.hlsl",
+              "RelativeToolTip": "Shaders\\DeferredLights.hlsl",
+              "ViewState": "AgIAAP8AAAAAAAAAAAAAABgBAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-03-10T17:18:04.36Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "RTLights.hlsl",
+              "DocumentMoniker": "C:\\Users\\Maxim\\Documents\\GitHub\\CGLAB_SEM5\\RT_LAB\\DX12App\\Shaders\\RTLights.hlsl",
+              "RelativeDocumentMoniker": "Shaders\\RTLights.hlsl",
+              "ToolTip": "C:\\Users\\Maxim\\Documents\\GitHub\\CGLAB_SEM5\\RT_LAB\\DX12App\\Shaders\\RTLights.hlsl",
+              "RelativeToolTip": "Shaders\\RTLights.hlsl",
+              "ViewState": "AgIAAP8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-03-10T17:14:47.701Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "DX12App.cpp",
               "DocumentMoniker": "C:\\Users\\Maxim\\Documents\\GitHub\\CGLAB_SEM5\\RT_LAB\\DX12App\\DX12App.cpp",
               "RelativeDocumentMoniker": "DX12App.cpp",
               "ToolTip": "C:\\Users\\Maxim\\Documents\\GitHub\\CGLAB_SEM5\\RT_LAB\\DX12App\\DX12App.cpp",
               "RelativeToolTip": "DX12App.cpp",
-              "ViewState": "AgIAAIgHAAAAAAAAAAAAAJcHAAA1AAAAAAAAAA==",
+              "ViewState": "AgIAAI4HAAAAAAAAAAAAAJgHAAADAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2026-03-09T20:53:09.08Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-09T20:53:09.08Z"
             }
           ]
         }

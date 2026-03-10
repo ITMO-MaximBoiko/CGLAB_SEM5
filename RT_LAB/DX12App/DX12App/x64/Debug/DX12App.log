@@ -1,18 +1,8 @@
-﻿  Camera.cpp
-  d3dApp.cpp
-  d3dUtil.cpp
-  DDSTextureLoader.cpp
-  GameTimer.cpp
-  GeometryGenerator.cpp
-  MathHelper.cpp
-  FrameResource.cpp
-  Gbuffer.cpp
-  ShadowMap.cpp
-  DX12App.cpp
-C:\Users\Maxim\Documents\GitHub\CGLAB_SEM5\RT_LAB\DX12App\DX12App.cpp(1974,36): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
-C:\Users\Maxim\Documents\GitHub\CGLAB_SEM5\RT_LAB\DX12App\DX12App.cpp(1978,67): warning C4267: аргумент: преобразование из "size_t" в "INT"; возможна потеря данных
-C:\Users\Maxim\Documents\GitHub\CGLAB_SEM5\RT_LAB\DX12App\DX12App.cpp(1979,67): warning C4267: аргумент: преобразование из "size_t" в "INT"; возможна потеря данных
-C:\Users\Maxim\Documents\GitHub\CGLAB_SEM5\RT_LAB\DX12App\DX12App.cpp(1980,49): warning C4267: аргумент: преобразование из "size_t" в "INT"; возможна потеря данных
+﻿  DX12App.cpp
+C:\Users\Maxim\Documents\GitHub\CGLAB_SEM5\RT_LAB\DX12App\DX12App.cpp(1981,36): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Maxim\Documents\GitHub\CGLAB_SEM5\RT_LAB\DX12App\DX12App.cpp(1985,67): warning C4267: аргумент: преобразование из "size_t" в "INT"; возможна потеря данных
+C:\Users\Maxim\Documents\GitHub\CGLAB_SEM5\RT_LAB\DX12App\DX12App.cpp(1986,67): warning C4267: аргумент: преобразование из "size_t" в "INT"; возможна потеря данных
+C:\Users\Maxim\Documents\GitHub\CGLAB_SEM5\RT_LAB\DX12App\DX12App.cpp(1987,49): warning C4267: аргумент: преобразование из "size_t" в "INT"; возможна потеря данных
 C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xutility(4924,18): warning C4244: =: преобразование "const wchar_t" в "char", возможна потеря данных
   (компиляция исходного файла "DX12App.cpp")
       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xutility(4924,18):
@@ -46,5 +36,4 @@ C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\
               _SizeTy=unsigned __int64
           ]
   
-  Создание кода...
   DX12App.vcxproj -> C:\Users\Maxim\Documents\GitHub\CGLAB_SEM5\RT_LAB\DX12App\x64\Debug\DX12App.exe

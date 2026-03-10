@@ -1951,6 +1951,13 @@ void DX12App::BuildLightObjects()
 	point1->Strength = { 2.f, 2.f, 2.f };
 	mAllLights.push_back(std::move(point1));
 
+	auto point2 = std::make_unique<LightObject>();
+	point2->LightType = LightType::Pointlight;
+	point2->Color = { 0.1f, 1.f, 0.81f };
+	point2->Position = { 15.f, 20.f, 10.f };
+	point2->Strength = { 2.f, 2.f, 2.f };
+	mAllLights.push_back(std::move(point2));
+
 	auto srvCpuStart = mSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	auto srvGpuStart = mSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 	auto dsvCpuStart = mDsvHeap->GetCPUDescriptorHandleForHeapStart();
